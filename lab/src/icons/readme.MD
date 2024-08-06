@@ -1,0 +1,1 @@
+ pyside6-rcc lab/src/icons/Icons.qrc -o lab/src/icons_rc.py

@@ -1,0 +1,4 @@
+{
+    "python.defaultInterpreterPath": "C:\\program\\Lab\\env\\Scripts\\python.exe",
+    "terminal.integrated.env.windows": { "PYTHONPATH": "${workspaceFolder}\\lab\\src;${workspaceFolder}\\lab" }
+}

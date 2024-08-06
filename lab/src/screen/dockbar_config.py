@@ -1,0 +1,1 @@
+dockerbar_configuration = ["Pixel Value","Ratio","Behavior","Trajectory"]

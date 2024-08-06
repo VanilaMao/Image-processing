@@ -1,0 +1,26 @@
+<RCC>
+  <qresource prefix="Icons">
+    <file>adjustment.png</file>
+    <file>app.png</file>
+    <file>close.png</file>
+    <file>cursor_selection.png</file>
+    <file>down.png</file>
+    <file>end.png</file>
+    <file>left.png</file>
+    <file>next.png</file>
+    <file>open.png</file>
+    <file>pause.png</file>
+    <file>play.png</file>
+    <file>preview.png</file>
+    <file>reopen.png</file>
+    <file>right.png</file>
+    <file>second.png</file>
+    <file>skip.png</file>
+    <file>start.png</file>
+    <file>stop.png</file>
+    <file>up.png</file>
+    <file>worm.png</file>
+    <file>zoom_in.png</file>
+    <file>zoom_out.png</file>
+  </qresource>
+</RCC>
