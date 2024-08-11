@@ -17,7 +17,9 @@ class Graph(Ui_Widget, QWidget):
         self._max= max
         self._min = min
         self.max.setValue(self._max)
+        self.max.setRange(-66536.0,66536.0)
         self.min.setValue(self._min)
+        self.min.setRange(-66536.0,66536.0)
         self.max.valueChanged.connect(lambda x: self.set_minmax(x,1))
         self.min.valueChanged.connect(lambda x: self.set_minmax(x, 0))
         self._plotGraph.showGrid(x=True, y=True)
@@ -51,8 +53,8 @@ class Graph(Ui_Widget, QWidget):
     
     def set_yaxis_max(self):
         if math.isclose(self._max, 0.0):
-            max = np.max(self._y_values)+1
-            min = np.max(self._y_values)-1
+            max = np.max(self._y_values)+2
+            min = np.min(self._y_values)-2
             self._plotGraph.setYRange(min, max)
         else:
             self._plotGraph.setYRange(self._min, self._max)

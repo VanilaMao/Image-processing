@@ -1,5 +1,6 @@
 adjustment_icon = u":/Icons/adjustment.png"
 app_icon = u":/Icons/app.png"
+auto_icon=u":/Icons/auto.png"
 close_icon = u":/Icons/close.png"
 cursor_selection_icon = u":/Icons/cursor_selection.png"
 down_icon = u":/Icons/down.png"

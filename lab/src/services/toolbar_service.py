@@ -1,7 +1,7 @@
 from typing import Dict, List
 from gui.image_tools import ImageToolsEnum
 from injector import inject, singleton
-from qtpy.QtCore import Signal, QObject
+from qtpy.QtCore import Signal, QObject, QSignalBlocker
 from qtpy.QtWidgets import QWidget
 from services.context_service import ContextService
 
@@ -27,10 +27,10 @@ class ToolbarService(QObject):
         "End": lambda config,value: setattr(config,"end", value),
         "Background":lambda config,value: setattr(config,"background", value),
         "Second": lambda config,value: setattr(config,"first_second_shift", value),
-        # "Max": lambda config,value: setattr(config,"first_second_shift", value),
+        "Auto": lambda config,value: setattr(config,"auto_process_image", value),
     }
        
-    starting_disable_list=["EndProcess","Skip","Next","StartProcess","Adjustment"] #they should be disbaled when process is not starting
+    starting_disable_list=["EndProcess","Skip","Next","StartProcess","Adjustment","Auto"] #they should be disbaled when process is not starting
     
     @inject
     def __init__(self, context_service:ContextService) -> None:
@@ -68,7 +68,7 @@ class ToolbarService(QObject):
         config = self._context_service.config
         if isinstance(value, str):
             value = int(value)
-        self.config_set[element](config, int(value))
+        self.config_set[element](config, value)
         self._context_service.update_config()
         
         # TODO define __call__ function in processconfig class instead
@@ -88,6 +88,18 @@ class ToolbarService(QObject):
     def enable_elements(self, elements:List[str]):
         for element in elements:
             self.enable(element)
+    
+    def check_element(self,element:str, value:bool, update_config:bool=True, block_signal:bool = False):
+        widget  = self._context_service.widgets[element]
+        blocker = None
+        if block_signal:
+            blocker = QSignalBlocker(widget)
+        widget.setChecked(value)
+        if update_config:
+            config = self._context_service.config
+            self.config_set[element](config,value)
+        if blocker is not None:
+            blocker.unblock()
 
     def init(self):
         self.disable_elements(self.starting_disable_list)

@@ -32,20 +32,38 @@ def toolbutton_slot(check_status,tool:ImageToolsEnum):
     tb = DI.get_di_instance().get(ToolbarService)
     if tool == ImageToolsEnum.Second:
         tb.update_config( "Second", check_status)
+    elif tool == ImageToolsEnum.Auto:
+        if check_status:
+            print("auto_ui set to true from clicking")
+            tb.disable_elements(["Skip","Next"])
+        else:
+            print("auto_ui set to false from clicking")
+            tb.enable_elements(["Skip","Next"])
+        tb.update_config( "Auto", check_status)       
 
 def process_handle(movement:ProcessMovement, element:str):
     tb = DI.get_di_instance().get(ToolbarService)
     ctx = DI.get_di_instance().get(ContextService)
+    sc = DI.get_di_instance().get(ScreenService)
     process:CarbinProcess = ctx.process
     if movement == ProcessMovement.Start:
         tb.disable_elements([element,"Start","End","Adjustment"])
-        tb.enable_elements(["EndProcess","Skip","Next"])
-        process.process()
+        tb.enable_elements(["EndProcess","Auto","Skip","Next"])
+        process.process(lambda:stop_ui(tb,sc),lambda status: auto_ui(tb, False))
     elif movement == ProcessMovement.Stop:
-        tb.disable_elements(["EndProcess","Skip","Next"])
-        tb.enable_elements(["StartProcess","Start", "End","Adjustment"])
         process.stop()
     elif movement == ProcessMovement.Skip:
         process.skip()
     elif movement == ProcessMovement.Next:
         process.next()
+
+def auto_ui(tb, status):
+    tb.check_element("Auto",status)
+    print("auto_ui")
+    tb.enable_elements(["Skip","Next"])
+
+def stop_ui(tb, sc):
+    tb.disable_elements(["EndProcess","Auto","Skip","Next"])
+    tb.enable_elements(["StartProcess","Start", "End","Adjustment"])
+    tb.check_element("Auto",False)
+    sc.show_status_message("Ready")

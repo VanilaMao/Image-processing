@@ -13,3 +13,4 @@ class ProcessConfig:
     start:int = 0
     end:int =0
     first_second_shift:bool = False
+    auto_process_image = False

@@ -1,5 +1,5 @@
 from pyqtribbon import RibbonCategoryStyle, RibbonButtonStyle
-from qtpy.QtGui import QIcon
+from qtpy.QtGui import QIcon,QKeySequence
 from qtpy.QtCore import Qt
 from icons.constants import *
 from actions.file_actions import *
@@ -340,6 +340,7 @@ process_menu = lambda :  {
                                     "icon":   QIcon(next_icon),
                                     "tooltip": "Open a worm file",
                                     "rowSpan": RibbonButtonStyle.Small,
+                                    "shortcut": QKeySequence(Qt.KeyboardModifier.ControlModifier|Qt.Key.Key_Right),
                                     "alignment": Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignBottom,
                                     "slot": lambda: process_handle(ProcessMovement.Next,"Next")
                                 },
@@ -352,6 +353,18 @@ process_menu = lambda :  {
                                     "rowSpan": RibbonButtonStyle.Large,
                                     "alignment": Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignBottom,
                                     "slot": lambda: process_handle(ProcessMovement.Start,"StartProcess")
+                                },
+                            },
+                            "Auto": {
+                                "type": "Button",
+                                "arguments": {
+                                    "icon":   QIcon(auto_icon),
+                                    "tooltip": "Process Images automatically",
+                                    "text": "Auto Process",
+                                    "checkable": True,
+                                    "rowSpan": RibbonButtonStyle.Large,
+                                    "alignment": Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignBottom,
+                                    "slot": lambda status: toolbutton_slot(status, ImageToolsEnum.Auto)
                                 },
                             },
                         },

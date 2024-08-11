@@ -6,6 +6,7 @@ class ImageToolsEnum(Enum):
     ZoomIn = 2
     ZoomOut=3
     Second= 4
+    Auto=5
 
 image_cursor_dict = {
     ImageToolsEnum.Select: Qt.CursorShape.CrossCursor

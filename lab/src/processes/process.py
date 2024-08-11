@@ -2,7 +2,7 @@ class ImageProcess:
     def __init__(self) -> None:
         pass
 
-    def prcoess(self):
+    def process(self,stop_action:callable = None,auto_action:callable = None):
         pass
 
     def init_open(self):

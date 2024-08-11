@@ -49,7 +49,7 @@ class Ui_Widget(object):
 
         self.max = QDoubleSpinBox(Widget)
         self.max.setObjectName(u"max")
-        self.max.setMinimumSize(QSize(80, 0))
+        self.max.setMinimumSize(QSize(100, 0))
         self.max.setButtonSymbols(QAbstractSpinBox.UpDownArrows)
         self.max.setSingleStep(0.100000000000000)
         self.max.setValue(2.000000000000000)
@@ -75,7 +75,7 @@ class Ui_Widget(object):
 
         self.min = QDoubleSpinBox(Widget)
         self.min.setObjectName(u"min")
-        self.min.setMinimumSize(QSize(80, 0))
+        self.min.setMinimumSize(QSize(100, 0))
         self.min.setSingleStep(0.100000000000000)
 
         self.horizontalLayout_2.addWidget(self.min)

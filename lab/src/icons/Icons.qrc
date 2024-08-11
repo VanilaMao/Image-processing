@@ -2,6 +2,7 @@
   <qresource prefix="Icons">
     <file>adjustment.png</file>
     <file>app.png</file>
+    <file>auto.png</file>
     <file>close.png</file>
     <file>cursor_selection.png</file>
     <file>down.png</file>

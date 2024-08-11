@@ -10,7 +10,17 @@ from models.worm import *
 from di.di import DI
 from processes.process_config import ProcessConfig
 from services.dialog_service import DialogService, DialogType
+from gui.utilities import process_ui_event
 
+# https://forum.qt.io/topic/134970/how-to-schedule-a-function-to-run-on-the-main-ui-thread/3 
+# https://stackoverflow.com/questions/6208339/qt-correct-way-to-post-events-to-a-qthread
+# https://stackoverflow.com/questions/6061352/creating-a-custom-message-event-with-qt
+# https://stackoverflow.com/questions/77116363/performing-bidirectional-signals-in-qthreads
+# https://forum.qt.io/topic/120262/how-can-i-queue-a-function-to-be-executed-in-the-main-thread-with-as-high-priority-as-possible/2
+# https://wiki.qt.io/Threads_Events_QObjects#:~:text=We%20can%20use%20the%20thread,has%20a%20running%20event%20loop.
+# https://stackoverflow.com/questions/49542608/qt-postevent-and-event-filter
+# https://stackoverflow.com/questions/17658811/how-do-i-process-events-on-a-qthread
+# may bring into a Qthread worker thread to handle processing
 
 def load_carbin_img(file):
     img = ImageProcessing.load_file(file)  # "icons/0442.tif"
@@ -32,6 +42,9 @@ class CarbinProcess(ImageProcess):
         self._file = file
         self._total_skipped =0
         self._process_status = False
+        self._auto_process= False
+        self._stop_ui_action:callable= None
+        self._auto_ui_action:callable= None
 
     @property
     def first_carbin(self): 
@@ -94,7 +107,9 @@ class CarbinProcess(ImageProcess):
 
         sc.show_status_message(f"Current processing Image File:{carbin.file}, Total Skipped:{self._total_skipped}")
 
-    def process(self):
+    def process(self,stop_action:callable = None,auto_action:callable = None):
+        self._stop_ui_action = stop_action
+        self._auto_ui_action = auto_action
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         config = self._process_config
         self._process_status = True
@@ -106,11 +121,12 @@ class CarbinProcess(ImageProcess):
         if not self._current_carbin.status:
             message = f"the carbin image {self._current_carbin.file} is not prcoessed"
             DialogService("Error!", 400,300,DialogType.Message,message).open()
-            return
+            return False
         self.generate_reports()
 
         self._prev_processed_carbin_frame = self._current_carbin_frame
         self.process_next_carbin()
+        return True
         
     def skip(self):
         self._total_skipped +=1
@@ -119,7 +135,7 @@ class CarbinProcess(ImageProcess):
     def process_next_carbin(self):
          # alreay reach the end
         if self._current_carbin_frame>=min(self._process_config.end, self._total_expected_carbins):
-            self.Stop()
+            self.stop()
             return    
         self._current_carbin_frame+=1
         self._current_carbin = self._carbins[self._current_carbin_frame]
@@ -134,13 +150,35 @@ class CarbinProcess(ImageProcess):
         self._prev_processed_carbin_frame= 0 
         self._carbin_reports.clear()
         self._process_status = False
+        self._auto_process = False
         self._total_skipped = 0
-        sc = DI.get_di_instance().get(ScreenService)
-        sc.show_status_message("Ready")
+        if self._stop_ui_action is not None:
+            self._stop_ui_action()
         
 
     def update(self):
-        self.process_carbin()
+        auto_process = self._process_config.auto_process_image
+        if not auto_process and self._auto_process:   # stop the auto process
+            self._auto_process = False
+            return
+        elif auto_process and not self._auto_process:  #start the auto process
+            self._auto_process = True
+            self.auto_process() 
+        elif auto_process and self._auto_process: #some other config setting when auto process is running
+            return
+        else:
+            self.process_carbin()
+    
+    def auto_process(self):
+        for _ in range(self._current_carbin_frame,int(min(self._process_config.end, self._total_expected_carbins))+1):
+            if not self._auto_process: #stop auto process
+                return
+            if not self.next():
+                self._auto_process = False
+                self._auto_ui_action(False)
+                return
+            process_ui_event() #give an chance to response the auto process disabling
+
 
     def generate_reports(self):
         config = self._process_config
@@ -156,7 +194,7 @@ class CarbinProcess(ImageProcess):
             dtime = pre_carbin.time
             speed = math.sqrt((dx1-dx)*(dx1-dx)+(dy1-dy)*(dy1-dy))/(dtime1-dtime)
            
-        left_mean, right_mean,binary_ratio = carbin.worm.cells[0].mean_density
+        left_mean, right_mean,_ = carbin.worm.cells[0].mean_density
         report = CarbinReport(speed,carbin.time,right_mean/left_mean,carbin.worm.track)
         self._carbin_reports.append(report)
         DI.get_di_instance().get(ScreenService).report(self._carbin_reports)
