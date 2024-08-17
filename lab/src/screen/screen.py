@@ -89,13 +89,17 @@ class Screen:
     def resize(self, width, height):
         self._mdi_subwindow.resize(width, height)
 
+    def move_window(self,loc):
+        self._mdi_subwindow.move(loc.x,loc.y)
+
     def get_window(self):
         return self._mdi_subwindow
 
     def close_event(self, event: QCloseEvent):
         event.accept()
+        geometry = self.get_window().geometry()
         DI.get_di_instance().get(ScreenEventSub).dispatchEvent(
-            ScreenEvent(ScreenEventEnum.close, self._identifier)
+            ScreenEvent(ScreenEventEnum.close, self._identifier, Rect(geometry.x(),geometry.y(),geometry.width(),geometry.height()))
         )
 
     # TODO not working on subwindow, but working in MDI Area
@@ -128,7 +132,7 @@ class Screen:
         sc_start = Point(self._drag_start.x(), self._drag_start.y())
         sc_end = Point(self._drag_end.x(), self._drag_end.y())
         event = ScreenMouseEvent(
-            ScreenEventEnum.select, self._identifier, sc_start, sc_end
+            ScreenEventEnum.select, self._identifier, None, sc_start, sc_end
         )
         DI.get_di_instance().get(ScreenEventSub).dispatchEvent(event)
         self._drag = False
@@ -162,16 +166,21 @@ class Conductor:
         self._current_screen = None
         self._layout = None
 
-    def activate_screen(self, screenIdentifier: ScreenIdentifier, image_loader:callable= None):
+    def activate_screen(self, screenIdentifier: ScreenIdentifier,image_loader:callable= None,force = False, loc=None):
         if screenIdentifier not in self._screens:
             screen = Screen(screenIdentifier,image_loader)
             self._screens[screenIdentifier] = screen
             self._mdi_area.addSubWindow(screen.get_window())
-            self._screens[screenIdentifier].resize(256, 512)         
+            if loc is not None:
+                self._screens[screenIdentifier].move_window(loc)
+                self._screens[screenIdentifier].resize(loc.width, loc.height) 
+            else:
+                self._screens[screenIdentifier].resize(256, 512)         
         elif image_loader is not None:
             self.update_screen(screenIdentifier,image_loader)
         
-        self._screens[screenIdentifier].show()
+        if force:
+            self._screens[screenIdentifier].show()
         self._current_screen = self._screens[screenIdentifier]
 
     def update_screen(self, screenIdentifier: ScreenIdentifier, content_updater:callable):

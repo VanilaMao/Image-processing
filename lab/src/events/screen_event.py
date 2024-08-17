@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from qtpy import QtCore
-from models.location import Point
+from models.location import Point, Rect
 from screen.screen_identifier import ScreenIdentifier
 
 class ScreenEventEnum(Enum):
@@ -14,6 +14,7 @@ class ScreenEventEnum(Enum):
 class ScreenEvent:
     event_type:ScreenEventEnum = None
     screen_id:ScreenIdentifier= None
+    loc:Rect = None
 
 @dataclass
 class ScreenMouseEvent(ScreenEvent):

@@ -61,8 +61,8 @@ class CarbinProcess(ImageProcess):
         
     def init_open(self):
         sc = DI.get_di_instance().get(ScreenService)
-        sc.open_screen(ScreenIdentifier.LEFTRAW, lambda: ImageProcessing.cv_to_qimage(self._carbins[0].left),True)
-        sc.open_screen(ScreenIdentifier.RIGHTRAW, lambda: ImageProcessing.cv_to_qimage(self._carbins[0].right),True)
+        sc.open_screen(ScreenIdentifier.LEFTRAW, lambda: ImageProcessing.cv_to_qimage(self._carbins[0].left),True, force=True)
+        sc.open_screen(ScreenIdentifier.RIGHTRAW, lambda: ImageProcessing.cv_to_qimage(self._carbins[0].right),True, force=True)
         self._current_carbin = self._carbins[0] # first one
         #starting processing to get rect
 
@@ -89,11 +89,11 @@ class CarbinProcess(ImageProcess):
                                                            self._process_config.first_second_shift)
         
         sc = DI.get_di_instance().get(ScreenService)
-        sc.open_screen(ScreenIdentifier.LEFTRAW, lambda: ImageProcessing.cv_to_qimage(left_unit8,'uint8'),True)
-        sc.open_screen(ScreenIdentifier.RIGHTRAW, lambda: ImageProcessing.cv_to_qimage(right_unit8,'uint8'),True)
-        sc.open_screen(ScreenIdentifier.LEFT, lambda: ImageProcessing.cv_to_qimage(left_unit8_binary,'uint8'),True)
-        sc.open_screen(ScreenIdentifier.RIGHT, lambda: ImageProcessing.cv_to_qimage(right_unit8_binary,'uint8'),True)
-        sc.open_screen(ScreenIdentifier.BINARY, lambda: ImageProcessing.cv_to_qimage(left_right_common_binary,'uint8'),True)
+        sc.open_screen(ScreenIdentifier.LEFTRAW, lambda: ImageProcessing.cv_to_qimage(left_unit8,'uint8'))
+        sc.open_screen(ScreenIdentifier.RIGHTRAW, lambda: ImageProcessing.cv_to_qimage(right_unit8,'uint8'))
+        sc.open_screen(ScreenIdentifier.LEFT, lambda: ImageProcessing.cv_to_qimage(left_unit8_binary,'uint8'))
+        sc.open_screen(ScreenIdentifier.RIGHT, lambda: ImageProcessing.cv_to_qimage(right_unit8_binary,'uint8'))
+        sc.open_screen(ScreenIdentifier.BINARY, lambda: ImageProcessing.cv_to_qimage(left_right_common_binary,'uint8'))
 
         if largest_rect is not None:
             sc.draw_screen_rect(None,Point(largest_rect.x,largest_rect.y), Point(largest_rect.x+largest_rect.width,largest_rect.y+largest_rect.height))

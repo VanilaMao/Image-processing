@@ -330,6 +330,7 @@ process_menu = lambda :  {
                                     "icon":   QIcon(skip_icon),
                                     "tooltip": "Open a worm file",
                                     "rowSpan": RibbonButtonStyle.Small,
+                                    "shortcut": QKeySequence(Qt.KeyboardModifier.ControlModifier|Qt.Key.Key_Down),
                                     "alignment": Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignBottom,
                                     "slot": lambda: process_handle(ProcessMovement.Skip,"Skip")
                                 },

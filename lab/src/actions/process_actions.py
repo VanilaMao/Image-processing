@@ -20,7 +20,7 @@ def checkbox_slot(widget, id: ScreenIdentifier):
         if state == 0:
             sc.hide_screen(id)
         if state == 2:
-            sc.open_screen(id)
+            sc.open_screen(id, force=True)
     return check_status
 
 def linedit_slot(widget:QLineEdit,element:str):

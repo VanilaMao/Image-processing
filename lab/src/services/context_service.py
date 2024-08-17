@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Any, Dict
+from gui.ui_config import UiConfig
 from processes.process import ImageProcess
 from processes.process_config import ProcessConfig
 from qtpy.QtWidgets import QWidget
@@ -10,11 +11,12 @@ class Context:
     fileName:str
     process:ImageProcess
     config:ProcessConfig
+    ui: UiConfig
     widgets:Dict[str,QWidget]
 
 class ContextService:
     def __init__(self) -> None:
-        self._context = Context(None, None, ProcessConfig(0,255,50,255,500,50),{})
+        self._context = Context(None, None,  ProcessConfig(0,255,50,255,500,50),UiConfig({}),{})
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name == "fileName":
@@ -25,6 +27,8 @@ class ContextService:
             self._context.config = value
         elif name == "widgets":
             self._context.widgets = value
+        elif name =="ui":
+            self._context.ui = value
         else:
             super(ContextService, self).__setattr__(name, value)
 
