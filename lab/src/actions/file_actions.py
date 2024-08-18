@@ -20,7 +20,8 @@ def open_file():
 
     dir = Path(context_service.fileName).parents[0]
     file = Path(context_service.fileName).stem
-    context_service.process = CarbinProcess(total-1, dir, file, context_service.config)
+    doc_service =  DI.get_di_instance().get(DocumentService)
+    context_service.process = CarbinProcess(total-1, dir, file, context_service.config, doc_service)
     context_service.process.build_carbins(carbin_infos)
     Carbin.right_margin = None # adjustment is reset for new file
 

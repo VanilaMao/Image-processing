@@ -5,6 +5,7 @@ from typing import List
 from image_processing.image_processing import ImageProcessing
 import numpy as np
 from processes.process import ImageProcess
+from services.document_service import DocType, DocumentService
 from services.screen_service import *
 from models.worm import *
 from di.di import DI
@@ -30,7 +31,7 @@ def load_carbin_img(file):
 
 class CarbinProcess(ImageProcess):
     timestamp = None
-    def __init__(self, total_frames, carbin_dir, file, config:ProcessConfig) -> None:
+    def __init__(self, total_frames, carbin_dir, file, config:ProcessConfig, doc_service:DocumentService= None) -> None:
         self._carbins:List[Carbin] = []
         self._carbin_reports:List[CarbinReport]=[]
         self._current_carbin:Carbin = None
@@ -45,6 +46,8 @@ class CarbinProcess(ImageProcess):
         self._auto_process= False
         self._stop_ui_action:callable= None
         self._auto_ui_action:callable= None
+        self._document_service = doc_service
+        self._save_file = None
 
     @property
     def first_carbin(self): 
@@ -152,6 +155,7 @@ class CarbinProcess(ImageProcess):
         self._process_status = False
         self._auto_process = False
         self._total_skipped = 0
+        self._save_file = None
         if self._stop_ui_action is not None:
             self._stop_ui_action()
         
@@ -202,11 +206,13 @@ class CarbinProcess(ImageProcess):
         
 
     def save_report(self, report:CarbinReport, carbin:Carbin):
+        @dataclass
+        class ReportData:
+            report:CarbinReport = None
+            carbin:Carbin = None
+            file:str = None
         if len(self._carbin_reports) > 0:
-            save_file = f"{self._dir}/{self._file}(Frame{int(self._process_config.start)}-{int(self._process_config.end)})-{self.timestamp}.txt"
-            with open(save_file,"a+") as file:
-                left_mean,right_mean,binary_mean = carbin.worm.cells[0].mean_density
-                file.write(f"{carbin.time:<10.6f}  {binary_mean:<10.6f}   {left_mean:<14.6f}  {right_mean:<14.6f} {report.speed:<14.6f}  {carbin.worm.track.x:<14.6f} {carbin.worm.track.y:<14.6f}\n")
-        
-
+            if self._save_file is None:
+                self._save_file = f"{self._dir}/{self._file}(Frame{int(self._process_config.start)}-{int(self._process_config.end)})-{self.timestamp}"
+            self._document_service.save(DocType.Excel,ReportData(report,carbin,self._save_file))
         
