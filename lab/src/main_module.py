@@ -5,6 +5,7 @@ from icons.constants import *
 from qtpy.QtGui import QIcon
 from qtpy.QtCore import QObject, QThread
 from gui.utilities import process_ui_event
+from models.worm import Carbin
 
 import icons_rc
 from services.context_service import ContextService
@@ -33,7 +34,7 @@ class LabWindow(QMainWindow):
             children.close()
 
         process_ui_event()
-        self._doc_service.save(DocType.Settings, self._locs)
+        self._doc_service.save(DocType.Settings, self._locs, margin=Carbin.right_margin)
         super(LabWindow, self).closeEvent(event)
 
 class MainModule(Module):
@@ -42,7 +43,9 @@ class MainModule(Module):
     @inject
     def provide_main_window(self,context_service:ContextService, doc_service:DocumentService)->QMainWindow:
         # Central widget
-        context_service.ui.locations = doc_service.load(DocType.Settings)
+        locations, margin = doc_service.load(DocType.Settings)
+        context_service.ui.locations = locations
+        Carbin.right_margin = margin
         window = LabWindow(context_service.ui.locations, doc_service)
         window.setWindowIcon(QIcon(app_icon))
         window.setWindowTitle("Image Processing")

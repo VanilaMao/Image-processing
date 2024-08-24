@@ -6,6 +6,7 @@ from yaml import dump, safe_load
 from dataclasses import asdict
 from screen.screen_identifier import ScreenIdentifier
 from models.location import Rect
+from models.worm import Margin
 import pandas as pd
 
 class DocType(Enum):
@@ -17,12 +18,16 @@ class DocumentService:
     def __init__(self) -> None:
         self._excel_file_row = {}
 
-    def save(self,type:DocType, data):
+    def save(self,type:DocType, data, **kwargs):
         if type == DocType.Settings:
             path = user_config_dir("ImageProcessing")
             pathlib.Path(path).mkdir(parents=True,exist_ok=True)
             with open(f"{path}/settings.yml","w+") as file:
-                dump(self.normlize_locations(data), file, default_flow_style=False)  
+                dump_data = self.normlize_locations(data)
+                margin = kwargs.get("margin",None)
+                if margin is not None:
+                    dump_data.update({"Margin":asdict(margin)})
+                dump(dump_data, file, default_flow_style=False)  
         elif type == DocType.Text:
             self.save_text(data)
         elif type == DocType.Excel:
@@ -74,10 +79,15 @@ class DocumentService:
     
     @staticmethod
     def denormlize_locations(data):
+        if data is None:
+            return {}, None
         denorm_data ={}
+        if "Margin" in data:
+            margin_data = Margin(**data["Margin"])
+            del data["Margin"]
         for loc in data:
             denorm_data[ScreenIdentifier[loc]] =Rect(**data[loc])
-        return denorm_data
+        return denorm_data, margin_data
 
 
 if __name__ == "__main__":

@@ -27,7 +27,8 @@ class DialogService:
     
     def create_dialog_widget(self, type:DialogType)->DialogWidget:
         if type == DialogType.AdjustImage:
-            return ImageAdjustWidget(self._model.left,self._model.right,self._width,self._height)   #model is carbin
+            if callable(self._model):
+                return ImageAdjustWidget(lambda index:self._model(index).left,lambda index:self._model(index).right, self._model(0).right_margin, self._width,self._height)   #model is carbin
         if type == DialogType.Message:
             return Message(self._model)
         return None

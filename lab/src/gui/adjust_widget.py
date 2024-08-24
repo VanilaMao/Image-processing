@@ -15,8 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QPushButton,
-    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit,
+    QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
+    QWidget)
 
 class Ui_widget(object):
     def setupUi(self, widget):
@@ -101,6 +102,38 @@ class Ui_widget(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.ImageIndex = QLabel(widget)
+        self.ImageIndex.setObjectName(u"ImageIndex")
+        sizePolicy1.setHeightForWidth(self.ImageIndex.sizePolicy().hasHeightForWidth())
+        self.ImageIndex.setSizePolicy(sizePolicy1)
+        self.ImageIndex.setMaximumSize(QSize(16777215, 16777215))
+
+        self.horizontalLayout_2.addWidget(self.ImageIndex)
+
+        self.order = QLineEdit(widget)
+        self.order.setObjectName(u"order")
+        sizePolicy1.setHeightForWidth(self.order.sizePolicy().hasHeightForWidth())
+        self.order.setSizePolicy(sizePolicy1)
+        self.order.setMaximumSize(QSize(60, 16777215))
+
+        self.horizontalLayout_2.addWidget(self.order)
+
+        self.apply = QPushButton(widget)
+        self.apply.setObjectName(u"apply")
+        sizePolicy1.setHeightForWidth(self.apply.sizePolicy().hasHeightForWidth())
+        self.apply.setSizePolicy(sizePolicy1)
+
+        self.horizontalLayout_2.addWidget(self.apply)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+
         self.label = QLabel(widget)
         self.label.setObjectName(u"label")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
@@ -129,6 +162,8 @@ class Ui_widget(object):
         self.redo.setText(QCoreApplication.translate("widget", u"Redo", None))
         self.undo.setText(QCoreApplication.translate("widget", u"Undo", None))
         self.reset.setText(QCoreApplication.translate("widget", u"Restart", None))
+        self.ImageIndex.setText(QCoreApplication.translate("widget", u"Image Index:", None))
+        self.apply.setText(QCoreApplication.translate("widget", u"Apply", None))
         self.label.setText(QCoreApplication.translate("widget", u"TextLabel", None))
     # retranslateUi
 

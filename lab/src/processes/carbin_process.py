@@ -52,6 +52,9 @@ class CarbinProcess(ImageProcess):
     @property
     def first_carbin(self): 
         return self._current_carbin
+    
+    def index_carbin(self, index):
+        return self._carbins[index]
 
     def build_carbins(self, carbin_infos):
         line = 0

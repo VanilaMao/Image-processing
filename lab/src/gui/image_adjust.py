@@ -18,7 +18,7 @@ class AdjustActionType(Enum):
     Reset = 7
 
 class ImageAdjustWidget(Ui_widget, QWidget, DialogWidget):
-    def __init__(self, left, right, width, height):
+    def __init__(self, left, right, margin, width, height):
         super().__init__()
         self.setupUi(self)
         self._undos = []
@@ -30,17 +30,27 @@ class ImageAdjustWidget(Ui_widget, QWidget, DialogWidget):
         self.redo.clicked.connect(lambda: self.btn_action(AdjustActionType.Redo))
         self.undo.clicked.connect(lambda: self.btn_action(AdjustActionType.Undo))
         self.reset.clicked.connect(lambda: self.btn_action(AdjustActionType.Reset))
-        self._left= ImageProcessing.convert_uint16_to_uint8(left)
-        self._right = ImageProcessing.convert_uint16_to_uint8(right)
-        self._move_right = 0
-        self._move_down = 0
+        self.apply.clicked.connect(self.reload_image)
+        self._left_callbale = left
+        self._right_callable = right
+        self._left= ImageProcessing.convert_uint16_to_uint8(self._left_callbale(0))
+        self._right = ImageProcessing.convert_uint16_to_uint8(self._right_callable(0))
+        self._move_right = margin.right if margin is not None else 0
+        self._move_down = margin.bottom if margin is not None else 0
+        self.order.setText("0")
         self._height = height
         self._width = width
         self.update_image()
         self.update_movement_label()
         self._result = (self._move_right,self._move_down)
 
-    
+    def reload_image(self):
+        index = self.order.text()
+        if index:
+            self._left = ImageProcessing.convert_uint16_to_uint8(self._left_callbale(int(index)))
+            self._right = ImageProcessing.convert_uint16_to_uint8(self._right_callable(int(index)))
+            self.update_image()
+
     def update_movement_label(self):
         self.label.setText(f"Move Right:{self._move_right},  Move Down:{self._move_down}")
 

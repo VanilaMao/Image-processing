@@ -23,7 +23,8 @@ def open_file():
     doc_service =  DI.get_di_instance().get(DocumentService)
     context_service.process = CarbinProcess(total-1, dir, file, context_service.config, doc_service)
     context_service.process.build_carbins(carbin_infos)
-    Carbin.right_margin = None # adjustment is reset for new file
+
+    # Carbin.right_margin = None # adjustment is reset for new file, but users want a setting loading
 
     tb = DI.get_di_instance().get(ToolbarService)
     tb.update_to_ui({"Start":config.start,"End":config.end})
@@ -33,8 +34,7 @@ def open_file():
 def adjust_carbin():
     context_service = DI.get_di_instance().get(ContextService)
     process:CarbinProcess = context_service.process
-    carbin = process.first_carbin
-    dg = DialogService("Image Adjust", 600, 600, DialogType.AdjustImage, carbin)
+    dg = DialogService("Image Adjust", 600, 600, DialogType.AdjustImage, lambda index: process.index_carbin(index))
     result = dg.open()
     if result is not None:
         right, down = result
