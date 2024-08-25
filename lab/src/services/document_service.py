@@ -61,13 +61,13 @@ class DocumentService:
         left_mean,right_mean,binary_mean = carbin.worm.cells[0].mean_density
         if os.path.exists(output):
             with pd.ExcelWriter(output, engine="openpyxl",mode="a", if_sheet_exists="overlay") as writer:
-                df = pd.DataFrame([[carbin.time,binary_mean,left_mean,right_mean,report.speed,carbin.worm.track.x,carbin.worm.track.y]])
+                df = pd.DataFrame([[carbin.time,left_mean/right_mean,left_mean,right_mean,report.speed,carbin.worm.track.x,carbin.worm.track.y]])
                 self._excel_file_row[output] = self._excel_file_row[output]+1
                 df.to_excel(writer,sheet_name="Sheet1", index=False, header=False,startrow=self._excel_file_row[output])
         else:
             with pd.ExcelWriter(output, engine="openpyxl",mode="w") as writer:
-                df = pd.DataFrame([[carbin.time,binary_mean,left_mean,right_mean,report.speed,carbin.worm.track.x,carbin.worm.track.y]],
-                                  columns=["Time", "B_ratio","L_ratio", "R_ratio", "Speed", "X", "Y"])
+                df = pd.DataFrame([[carbin.time,left_mean/right_mean,left_mean,right_mean,report.speed,carbin.worm.track.x,carbin.worm.track.y]],
+                                  columns=["Time", "ratio","L_ratio", "R_ratio", "Speed", "X", "Y"])
                 df.to_excel(writer,sheet_name="Sheet1", index=False)
 
     @staticmethod
