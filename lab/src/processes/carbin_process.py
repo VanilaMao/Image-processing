@@ -135,6 +135,11 @@ class CarbinProcess(ImageProcess):
         return True
         
     def skip(self):
+        # Save report even the carbin is skipped and not processed
+        self._current_carbin.worm.cells.clear() # disgard any processing
+        self.generate_reports(False)
+        self._prev_processed_carbin_frame = self._current_carbin_frame
+
         self._total_skipped +=1
         self.process_next_carbin()
 
@@ -187,7 +192,7 @@ class CarbinProcess(ImageProcess):
             process_ui_event() #give an chance to response the auto process disabling
 
 
-    def generate_reports(self):
+    def generate_reports(self, cal_ratio = True):
         config = self._process_config
         carbin = self._carbins[self._current_carbin_frame]
         speed = 0
@@ -200,11 +205,14 @@ class CarbinProcess(ImageProcess):
             dtime1 = carbin.time
             dtime = pre_carbin.time
             speed = math.sqrt((dx1-dx)*(dx1-dx)+(dy1-dy)*(dy1-dy))/(dtime1-dtime)
-           
-        left_mean, right_mean,_ = carbin.worm.cells[0].mean_density
-        report = CarbinReport(speed,carbin.time,right_mean/left_mean,carbin.worm.track)
-        self._carbin_reports.append(report)
-        DI.get_di_instance().get(ScreenService).report(self._carbin_reports)
+
+        if cal_ratio: 
+            left_mean, right_mean,_ = carbin.worm.cells[0].mean_density
+            report = CarbinReport(speed,carbin.time,right_mean/left_mean,carbin.worm.track)
+            self._carbin_reports.append(report)
+            DI.get_di_instance().get(ScreenService).report(self._carbin_reports)
+        else:
+            report = CarbinReport(speed,carbin.time,-1.0,carbin.worm.track)
         self.save_report(report,carbin)
         
 

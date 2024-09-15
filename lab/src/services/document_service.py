@@ -41,7 +41,7 @@ class DocumentService:
                     data = safe_load(file)
                     return self.denormlize_locations(data)
             except FileNotFoundError:
-                return {}
+                return {}, None
 
     @staticmethod
     def save_text(data):
@@ -58,15 +58,19 @@ class DocumentService:
         output = f"{data.file}.xlsx"
         if output not in self._excel_file_row:
             self._excel_file_row[output] = 1
-        left_mean,right_mean,binary_mean = carbin.worm.cells[0].mean_density
+        if len(carbin.worm.cells)>0:
+            left_mean,right_mean,binary_mean = carbin.worm.cells[0].mean_density
+            ratio = left_mean/right_mean
+        else:
+            left_mean=right_mean=ratio = -1.0
         if os.path.exists(output):
             with pd.ExcelWriter(output, engine="openpyxl",mode="a", if_sheet_exists="overlay") as writer:
-                df = pd.DataFrame([[carbin.time,left_mean/right_mean,left_mean,right_mean,report.speed,carbin.worm.track.x,carbin.worm.track.y]])
+                df = pd.DataFrame([[carbin.time,ratio,left_mean,right_mean,report.speed,carbin.worm.track.x,carbin.worm.track.y]])
                 self._excel_file_row[output] = self._excel_file_row[output]+1
                 df.to_excel(writer,sheet_name="Sheet1", index=False, header=False,startrow=self._excel_file_row[output])
         else:
             with pd.ExcelWriter(output, engine="openpyxl",mode="w") as writer:
-                df = pd.DataFrame([[carbin.time,left_mean/right_mean,left_mean,right_mean,report.speed,carbin.worm.track.x,carbin.worm.track.y]],
+                df = pd.DataFrame([[carbin.time,ratio,left_mean,right_mean,report.speed,carbin.worm.track.x,carbin.worm.track.y]],
                                   columns=["Time", "ratio","L_ratio", "R_ratio", "Speed", "X", "Y"])
                 df.to_excel(writer,sheet_name="Sheet1", index=False)
 
@@ -82,6 +86,7 @@ class DocumentService:
         if data is None:
             return {}, None
         denorm_data ={}
+        margin_data = None
         if "Margin" in data:
             margin_data = Margin(**data["Margin"])
             del data["Margin"]
